@@ -18,7 +18,7 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e 'install.packages(c("httr2", "jsonlite", "ggplot2"), repos="https://cloud.r-project.org")'
+          Rscript -e 'pak::pkg_install(c("httr2", "jsonlite", "ggplot2"))'
 
       - name: Update crypto (BTC) chart
         run: Rscript scripts/crypto_btc.R
