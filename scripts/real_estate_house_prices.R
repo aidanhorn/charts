@@ -8,7 +8,7 @@ source("scripts/_theme.R")
 out_path <- "assets/real_estate/house_prices.png"
 
 COUNTRIES <- c(USA = "United States", GBR = "United Kingdom", DEU = "Germany",
-               JPN = "Japan", AUS = "Australia", CHN = "China")
+               AUS = "Australia", CHN = "China", ZAF = "South Africa")
 
 url <- "https://sdmx.oecd.org/public/rest/data/OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,/all?format=csvfilewithlabels&startPeriod=2015-Q1"
 raw <- read.csv(url, stringsAsFactors = FALSE, check.names = FALSE)

@@ -159,13 +159,31 @@ body.landing footer a { color: var(--link); }
     padding: 0.35rem 0.6rem;
   }
   .subnav {
+    flex-wrap: wrap;
     overflow-x: visible;
+    white-space: normal;
+    height: auto;
+    min-height: var(--subnav-height);
+    padding: 0.3rem 0.5rem;
+    align-content: center;
+    row-gap: 0.15rem;
+  }
+  .subnav a {
+    flex: 0 0 auto;
+    font-size: 0.82rem;
+    padding: 0.3rem 0.5rem;
+  }
+  /* Wrapped rows need a taller reserved strip so links don't sit on the
+     chart; --subnav-height also drives main padding-top and img max-height. */
+  body.has-subnav {
+    --subnav-height: 148px;
   }
   .subnav-label {
     /* The parent nav tab above is already highlighted as active, so this
-       label is redundant here - drop it rather than risk it wrapping the
-       subnav onto a second row, which would overflow its fixed height and
-       cut into the chart below (main's padding-top assumes one row). */
+       label is redundant on a wrapped phone row. */
     display: none;
   }
+  /* Nav already has the site name; the in-page h1 duplicates it and pushes
+     the pillar list below the fold. */
+  body.landing h1 { display: none; }
 }

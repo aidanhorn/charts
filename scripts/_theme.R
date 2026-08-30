@@ -121,48 +121,80 @@ build_fred_chart <- function(series_id, title_text, y_label, colour,
   list(plot = plot, latest = latest)
 }
 
-# Fetches/accumulates gold or silver prices via GoldAPI.io (needs
-# GOLD_API_IO - a repo secret in CI, read from ~/.Renviron locally). Unlike
-# every other commodity here, GoldAPI.io's historical endpoint is one date
-# per call (no range query), so this accumulates one row per `step_months`
-# into a CSV committed alongside the chart, fetching only whichever
-# dates aren't in it yet. The free tier's actual monthly quota turned out to
-# be far smaller than advertised (confirmed: a plain 8-year monthly backfill
-# - ~97 calls - exhausted it immediately), so this defaults to a shallow
-# quarterly, 2-year backfill rather than the 8-year monthly depth every
-# other commodity script uses; deepen it gradually (raise years_back and/or
-# lower step_months) once real quota headroom is confirmed month to month.
-# Requires httr2 to already be loaded.
-build_goldapi_chart <- function(metal_symbol, csv_path, title_text, colour, years_back = 2, step_months = 3) {
-  api_key <- Sys.getenv("GOLD_API_IO")
-  if (!nzchar(api_key)) stop("GOLD_API_IO environment variable is not set")
-
-  fetch_price <- function(date) {
-    resp <- httr2::request(sprintf("https://www.goldapi.io/api/%s/USD/%s", metal_symbol, format(date, "%Y%m%d"))) |>
-      httr2::req_headers(`x-access-token` = api_key) |>
-      httr2::req_perform()
-    httr2::resp_body_json(resp)$price
+# Gold/silver: FRED's LBMA series are discontinued, and per-date metals APIs
+# chew quota on backfill. The World Bank Pink Sheet publishes both metals
+# as monthly USD/troy oz in one Excel workbook. The workbook URL's hash
+# changes, so we scrape the current "Monthly prices" link from the
+# Commodity Markets page, then write data/gold_usd.csv and
+# data/silver_usd.csv. Requires httr2 + readxl.
+pinksheet_monthly_xlsx_url <- function() {
+  html <- httr2::request("https://www.worldbank.org/en/research/commodity-markets") |>
+    httr2::req_user_agent("charts.aidanhorn.co.za") |>
+    httr2::req_perform() |>
+    httr2::resp_body_string()
+  url <- regmatches(html, regexpr("https://[^\"' <>]+CMO-Historical-Data-Monthly\\.xlsx", html))
+  if (!length(url) || !nzchar(url[1])) {
+    stop("Could not find CMO-Historical-Data-Monthly.xlsx on the World Bank Commodity Markets page")
   }
+  url[1]
+}
 
-  if (file.exists(csv_path)) {
-    d <- read.csv(csv_path, stringsAsFactors = FALSE)
-    d$date <- as.Date(d$date)
-  } else {
-    d <- data.frame(date = as.Date(character()), price = numeric())
+update_pinksheet_precious_csvs <- function(gold_path = "data/gold_usd.csv",
+                                           silver_path = "data/silver_usd.csv") {
+  if (!requireNamespace("readxl", quietly = TRUE)) {
+    stop("Package 'readxl' is required to parse the Pink Sheet workbook")
   }
+  url <- pinksheet_monthly_xlsx_url()
+  cat("Pink Sheet monthly workbook:", url, "\n")
+  tmp <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(tmp), add = TRUE)
+  httr2::request(url) |>
+    httr2::req_user_agent("charts.aidanhorn.co.za") |>
+    httr2::req_perform(path = tmp)
 
-  today <- Sys.Date()
-  wanted <- seq(as.Date(format(today, "%Y-%m-01")), by = sprintf("-%d month", step_months), length.out = (years_back * 12) %/% step_months + 1)
-  wanted <- sort(wanted[wanted <= today])
-  missing <- wanted[!wanted %in% d$date]
-
-  for (i in seq_along(missing)) {
-    dt <- missing[i]
-    d <- rbind(d, data.frame(date = dt, price = fetch_price(dt)))
+  raw <- suppressMessages(
+    readxl::read_excel(tmp, sheet = "Monthly Prices", col_names = FALSE, .name_repair = "minimal")
+  )
+  as_chr <- function(x) trimws(as.character(unlist(x, use.names = FALSE)))
+  hdr <- NA_integer_
+  for (i in seq_len(min(12L, nrow(raw)))) {
+    v <- as_chr(raw[i, ])
+    if ("Gold" %in% v && "Silver" %in% v) {
+      hdr <- i
+      break
+    }
   }
-  d <- d[order(d$date), ]
-  write.csv(d, csv_path, row.names = FALSE)
+  if (is.na(hdr)) stop("Pink Sheet header row with Gold and Silver not found")
+  header <- as_chr(raw[hdr, ])
+  gold_col <- match("Gold", header)
+  silver_col <- match("Silver", header)
+  dates <- as_chr(raw[[1]])
+  start <- which(grepl("^[0-9]{4}M[0-9]{2}$", dates))[1]
+  if (is.na(start)) stop("Pink Sheet date column (YYYYMmm) not found")
 
+  parse_cmo_date <- function(x) as.Date(paste0(substr(x, 1, 4), "-", substr(x, 6, 7), "-01"))
+  keep <- start:nrow(raw)
+  d_gold <- data.frame(
+    date = parse_cmo_date(dates[keep]),
+    price = suppressWarnings(as.numeric(as_chr(raw[keep, gold_col])))
+  )
+  d_silver <- data.frame(
+    date = parse_cmo_date(dates[keep]),
+    price = suppressWarnings(as.numeric(as_chr(raw[keep, silver_col])))
+  )
+  d_gold <- d_gold[!is.na(d_gold$date) & !is.na(d_gold$price), ]
+  d_silver <- d_silver[!is.na(d_silver$date) & !is.na(d_silver$price), ]
+  dir.create("data", recursive = TRUE, showWarnings = FALSE)
+  write.csv(d_gold, gold_path, row.names = FALSE)
+  write.csv(d_silver, silver_path, row.names = FALSE)
+  invisible(list(gold = d_gold, silver = d_silver, url = url))
+}
+
+build_pinksheet_metal_chart <- function(csv_path, title_text, colour, tail_n = 12 * 8) {
+  update_pinksheet_precious_csvs()
+  d <- read.csv(csv_path, stringsAsFactors = FALSE)
+  d$date <- as.Date(d$date)
+  if (!is.null(tail_n)) d <- tail(d, tail_n)
   latest <- d[nrow(d), ]
   fmt_price <- function(v) formatC(v, format = "f", digits = 0, big.mark = " ")
 
@@ -173,7 +205,7 @@ build_goldapi_chart <- function(metal_symbol, csv_path, title_text, colour, year
       title = title_text,
       subtitle = sprintf("Latest: $%s on %s", fmt_price(latest$price), format(latest$date, "%b %Y")),
       x = NULL, y = "USD/troy oz",
-      caption = "Source: GoldAPI.io (LBMA) | charts.aidanhorn.co.za | auto-updated"
+      caption = "Source: World Bank Pink Sheet | charts.aidanhorn.co.za | auto-updated"
     ) +
     theme_dark_chart()
 

@@ -10,14 +10,14 @@ One folder per section, each an `index.html` (its default page) plus sibling pag
 - [climate/](climate/README.md) — global air quality
 - [energy/](energy/README.md) — generation mix by country
 - [real-estate/](real-estate/README.md) — global house-price growth
-- [commodities/](commodities/README.md) — oil, copper, natural gas, wheat, corn
+- [commodities/](commodities/README.md) — oil, metals, grains, softs
 - [traffic/](traffic/README.md) — deferred, unlinked from nav
 
 Shared styling in `assets/style.css`, shared dark/high-contrast ggplot2 theme + crypto/FRED chart-builder helpers in `scripts/_theme.R`. Every page carries a Google Analytics (gtag.js) tag.
 
 All data sources are free/public — no paid feeds, though FRED and OpenAQ need a (free, registered) API key stored as a repo secret. See `.github/workflows/update-charts.yml` for the scheduling and which secrets each step needs.
 
-Pages with a sub-nav (Crypto, Commodities) use a shorter portrait chart height (`port_h`) than single-page pillars, since the extra sub-nav bar leaves less vertical room on mobile before scrolling would be needed.
+Pages with a sub-nav (Crypto, Energy, Commodities) use a shorter portrait chart height (`port_h`) than single-page pillars, since the extra sub-nav bar leaves less vertical room on mobile before scrolling would be needed.
 
 ## Why this exists
 
