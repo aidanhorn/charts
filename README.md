@@ -17,4 +17,4 @@ All data sources are free/public — no paid feeds. See `.github/workflows/updat
 
 ## Why this exists
 
-Built as a deliberately separate, orthogonal-to-Codera project — see the private `hustle` vault's `docs/WEB_PROJECTS.md` for the full strategy and reasoning (not in this repo, since this one's public).
+Built as a deliberately separate project, chosen to be orthogonal to Aidan's day job at Codera Analytics — nothing here overlaps with EconData or SA official statistics.
