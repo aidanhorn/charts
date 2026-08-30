@@ -117,7 +117,10 @@ body.landing p.intro { color: var(--text-dim); }
 body.landing ul.pillar-list { list-style: none; padding: 0; }
 body.landing ul.pillar-list li { margin: 0.6rem 0; }
 body.landing ul.pillar-list a {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
   padding: 0.9rem 1.1rem;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -125,12 +128,14 @@ body.landing ul.pillar-list a {
   color: var(--text);
   text-decoration: none;
   font-size: 1.05rem;
+  white-space: normal;
 }
 body.landing ul.pillar-list a:hover { border-color: var(--link); }
+body.landing ul.pillar-list .pillar-name { display: block; }
 body.landing ul.pillar-list .pillar-desc {
   display: block;
-  margin-top: 0.35rem;
   font-size: 0.88rem;
+  line-height: 1.35;
   color: var(--text-dim);
   font-weight: 400;
 }
@@ -143,50 +148,73 @@ body.landing footer {
 }
 body.landing footer a { color: var(--link); }
 
-/* Mobile: the nav previously scrolled horizontally (overflow-x: auto),
-   which hid items past the fold - you had to know to scroll right to find
-   "Commodities". Wrap it onto two rows instead, so every tab is visible
-   immediately with no interaction needed. --nav-height grows to fit two
-   rows, and everything else (main's padding-top, the img max-height calc)
-   already derives from that variable, so nothing else needs to change. */
+/* Mobile: wrap the top nav so every tab is visible, size both bars to
+   their text (no reserved empty strip), and keep them sticky. */
 @media (max-width: 700px) {
-  :root {
-    --nav-height: 96px;
-    --subnav-height: 40px;
+  /* Take nav/subnav out of fixed pixel boxes so they hug their text.
+     Sticky keeps them on screen; in-flow height means main doesn't need
+     a guessed --nav-height / --subnav-height spacer. Landing stays block
+     so the pillar list can grow and scroll. */
+  body:not(.landing) {
+    display: flex;
+    flex-direction: column;
   }
   nav {
-    flex-wrap: wrap;
-    overflow-x: visible;
-    white-space: normal;
-    padding: 0.4rem 0.5rem;
-    align-content: center;
-  }
-  nav a {
-    font-size: 0.85rem;
-    padding: 0.35rem 0.6rem;
-  }
-  .subnav {
-    flex-wrap: wrap;
-    overflow-x: visible;
-    white-space: normal;
+    position: sticky;
+    top: 0;
     height: auto;
-    min-height: 0;
-    padding: 0.1rem 0.4rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    white-space: normal;
+    padding: 0.1rem 0.35rem;
     align-content: flex-start;
     row-gap: 0;
+    column-gap: 0.1rem;
+  }
+  nav a {
+    font-size: 0.82rem;
+    line-height: 1.2;
+    padding: 0.08rem 0.45rem;
+  }
+  .subnav {
+    position: sticky;
+    top: 0;
+    height: auto;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    white-space: normal;
+    min-height: 0;
+    padding: 0 0.3rem;
+    align-content: flex-start;
+    align-items: flex-start;
+    row-gap: 0;
+    column-gap: 0.1rem;
   }
   .subnav a {
     flex: 0 0 auto;
-    font-size: 0.8rem;
-    padding: 0.12rem 0.4rem;
+    font-size: 0.78rem;
+    line-height: 1.2;
+    padding: 0 0.35rem;
   }
-  /* Hug the wrapped rows; reserve only as much main padding as the
-     wrapped strip actually needs so the chart isn't pushed down. */
-  body.has-subnav {
-    --subnav-height: 64px;
+  main,
+  body.has-subnav main {
+    padding-top: 0;
   }
-  body.has-subnav:has(.subnav a:nth-of-type(10)) {
-    --subnav-height: 84px;
+  body:not(.landing) main,
+  body:not(.landing).has-subnav main {
+    flex: 1;
+    min-height: 0;
+  }
+  body.landing main {
+    padding: 0.15rem 1rem 2rem;
+  }
+  body.landing p.intro {
+    margin-top: 0.15rem;
+  }
+  body.has-subnav main img {
+    max-height: calc(100vh - 8rem);
   }
   .subnav-label {
     /* The parent nav tab above is already highlighted as active, so this
@@ -196,4 +224,8 @@ body.landing footer a { color: var(--link); }
   /* Nav already has the site name; the in-page h1 duplicates it and pushes
      the pillar list below the fold. */
   body.landing h1 { display: none; }
+  body.landing footer {
+    border-top: none;
+    padding-top: 0;
+  }
 }
