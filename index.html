@@ -4,15 +4,26 @@
 <meta charset="utf-8">
 <title>Aidan Horn — Data Charts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
 <style>
-  body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --link: #58a6ff;
+  }
+  html { background: var(--bg); }
+  body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background: var(--bg); color: var(--text); }
+  a { color: var(--link); }
   h1 { font-size: 1.6rem; }
-  p.intro { color: #444; }
+  p.intro { color: var(--text-dim); }
   .pillar { margin: 2.5rem 0; }
-  .pillar h2 { font-size: 1.2rem; border-bottom: 1px solid #ddd; padding-bottom: 0.3rem; }
-  .pillar img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; }
-  .pillar .status { color: #888; font-size: 0.9rem; }
-  footer { color: #888; font-size: 0.85rem; margin-top: 3rem; border-top: 1px solid #ddd; padding-top: 1rem; }
+  .pillar h2 { font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  .pillar img { max-width: 100%; border: 1px solid var(--border); border-radius: 4px; background: var(--panel); }
+  .pillar .status { color: var(--text-dim); font-size: 0.9rem; }
+  footer { color: var(--text-dim); font-size: 0.85rem; margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1rem; }
 </style>
 </head>
 <body>
@@ -25,12 +36,12 @@
 </div>
 
 <div class="pillar">
-  <h2>Climate — global air quality</h2>
-  <p class="status">Coming soon.</p>
+  <h2>Energy — generation mix by country</h2>
+  <img src="assets/energy/generation_mix.png" alt="World map of renewable share of electricity generation by country">
 </div>
 
 <div class="pillar">
-  <h2>Energy — generation mix by country</h2>
+  <h2>Climate — global air quality</h2>
   <p class="status">Coming soon.</p>
 </div>
 

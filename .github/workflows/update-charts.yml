@@ -2,7 +2,8 @@ name: Update charts
 
 on:
   schedule:
-    - cron: "15 6 * * *"  # daily, 06:15 UTC
+    - cron: "15 6 * * *"    # daily - crypto
+    - cron: "20 6 1 * *"    # monthly (1st) - slower-cadence pillars (energy, real estate, commodities, traffic)
   workflow_dispatch: {}
 
 permissions:
@@ -18,10 +19,15 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e 'install.packages(c("httr2", "jsonlite", "ggplot2"))'
+          Rscript -e 'install.packages(c("httr2", "jsonlite", "ggplot2", "maps"))'
 
       - name: Update crypto (BTC) chart
+        if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
         run: Rscript scripts/crypto_btc.R
+
+      - name: Update energy (generation mix) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        run: Rscript scripts/energy_generation_mix.R
 
       - name: Commit updated chart(s)
         run: |

@@ -7,6 +7,7 @@ suppressMessages({
   library(jsonlite)
   library(ggplot2)
 })
+source("scripts/_theme.R")
 
 out_path <- "assets/crypto/btc.png"
 
@@ -31,13 +32,8 @@ p <- ggplot(d, aes(x = time, y = price)) +
     x = NULL, y = "Price (log scale)",
     caption = "Source: CoinGecko | charts.aidanhorn.co.za | auto-updated"
   ) +
-  theme_bw(base_size = 12) +
-  theme(
-    panel.grid.minor = element_blank(),
-    plot.title = element_text(face = "bold"),
-    plot.caption = element_text(colour = "grey50", size = 8)
-  )
+  theme_dark_chart()
 
-ggsave(out_path, p, width = 8, height = 4.5, dpi = 150, bg = "white", create.dir = TRUE)
+ggsave(out_path, p, width = 8, height = 4.5, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 
 cat("Updated", out_path, "- latest BTC price: $", formatC(latest$price, format = "d", big.mark = ","), "as of", format(latest$time, "%Y-%m-%d"), "\n")
