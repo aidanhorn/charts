@@ -5,63 +5,32 @@
 <title>Aidan Horn — Data Charts</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<style>
-  :root {
-    --bg: #0d1117;
-    --panel: #161b22;
-    --border: #30363d;
-    --text: #c9d1d9;
-    --text-dim: #8b949e;
-    --link: #58a6ff;
-  }
-  html { background: var(--bg); }
-  body { font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background: var(--bg); color: var(--text); }
-  a { color: var(--link); }
-  h1 { font-size: 1.6rem; }
-  p.intro { color: var(--text-dim); }
-  .pillar { margin: 2.5rem 0; }
-  .pillar h2 { font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
-  .pillar img { max-width: 100%; border: 1px solid var(--border); border-radius: 4px; background: var(--panel); }
-  .pillar .status { color: var(--text-dim); font-size: 0.9rem; }
-  footer { color: var(--text-dim); font-size: 0.85rem; margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1rem; }
-</style>
+<link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
-<h1>Data Charts</h1>
-<p class="intro">A small set of automated, self-updating charts across a few domains I find genuinely interesting. Each one pulls from a real public data source on its own schedule — see <a href="https://github.com/aidanhorn/charts">the source</a> for exactly how.</p>
-
-<div class="pillar">
-  <h2>Crypto — Bitcoin (BTC/USD)</h2>
-  <img src="assets/crypto/btc.png" alt="Bitcoin price chart, log scale">
-</div>
-
-<div class="pillar">
-  <h2>Energy — generation mix by country</h2>
-  <img src="assets/energy/generation_mix.png" alt="World map of renewable share of electricity generation by country">
-</div>
-
-<div class="pillar">
-  <h2>Climate — global air quality</h2>
-  <img src="assets/climate/air_quality.png" alt="World map of PM2.5 air quality readings">
-</div>
-
-<div class="pillar">
-  <h2>Real estate — global house-price growth</h2>
-  <img src="assets/real_estate/house_prices.png" alt="Real house-price growth by country, year-on-year">
-</div>
-
-<div class="pillar">
-  <h2>Commodities — oil (Brent/WTI)</h2>
-  <img src="assets/commodities/oil_brent.png" alt="Brent crude oil price chart">
-</div>
-
-<div class="pillar">
-  <h2>Traffic — global congestion ranking</h2>
-  <p class="status">Coming soon.</p>
-</div>
-
-<footer>
-  <p>Part of <a href="https://www.aidanhorn.co.za">aidanhorn.co.za</a>.</p>
-</footer>
+<body class="landing">
+<nav>
+  <a class="home" href="index.html">Data Charts</a>
+  <a href="crypto.html">Crypto</a>
+  <a href="climate.html">Climate</a>
+  <a href="energy.html">Energy</a>
+  <a href="real-estate.html">Real estate</a>
+  <a href="commodities.html">Commodities</a>
+  <a href="traffic.html">Traffic</a>
+</nav>
+<main>
+  <h1>Data Charts</h1>
+  <p class="intro">A small set of automated, self-updating charts across a few domains I find genuinely interesting. Each one pulls from a real public data source on its own schedule — see <a href="https://github.com/aidanhorn/charts">the source</a> for exactly how.</p>
+  <ul class="pillar-list">
+    <li><a href="crypto.html">Crypto — Bitcoin (BTC/USD)</a></li>
+    <li><a href="climate.html">Climate — global air quality</a></li>
+    <li><a href="energy.html">Energy — generation mix by country</a></li>
+    <li><a href="real-estate.html">Real estate — global house-price growth</a></li>
+    <li><a href="commodities.html">Commodities — oil (Brent/WTI)</a></li>
+    <li><a href="traffic.html">Traffic — global congestion ranking</a></li>
+  </ul>
+  <footer>
+    <p>Part of <a href="https://www.aidanhorn.co.za">aidanhorn.co.za</a>.</p>
+  </footer>
+</main>
 </body>
 </html>

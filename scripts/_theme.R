@@ -4,8 +4,8 @@
 CHART_BG <- "#0d1117"
 CHART_PANEL <- "#161b22"
 CHART_GRID <- "#30363d"
-CHART_TEXT <- "#c9d1d9"
-CHART_TEXT_DIM <- "#8b949e"
+CHART_TEXT <- "#ffffff"
+CHART_TEXT_DIM <- "#d5dbe2"
 
 theme_dark_chart <- function(base_size = 12) {
   theme_bw(base_size = base_size) %+replace%
@@ -24,7 +24,7 @@ theme_dark_chart <- function(base_size = 12) {
       legend.background = element_rect(fill = CHART_BG, colour = NA),
       legend.key = element_rect(fill = CHART_PANEL, colour = NA),
       legend.text = element_text(colour = CHART_TEXT_DIM),
-      legend.title = element_text(colour = CHART_TEXT)
+      legend.title = element_text(colour = CHART_TEXT, margin = margin(b = 10))
     )
 }
 
@@ -37,6 +37,6 @@ theme_dark_void <- function(base_size = 12) {
       plot.caption = element_text(colour = CHART_TEXT_DIM, size = 8, margin = margin(t = 14)),
       legend.background = element_rect(fill = CHART_BG, colour = NA),
       legend.text = element_text(colour = CHART_TEXT_DIM),
-      legend.title = element_text(colour = CHART_TEXT)
+      legend.title = element_text(colour = CHART_TEXT, margin = margin(b = 10))
     )
 }
