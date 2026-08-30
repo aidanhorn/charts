@@ -127,6 +127,13 @@ body.landing ul.pillar-list a {
   font-size: 1.05rem;
 }
 body.landing ul.pillar-list a:hover { border-color: var(--link); }
+body.landing ul.pillar-list .pillar-desc {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  font-weight: 400;
+}
 body.landing footer {
   color: var(--text-dim);
   font-size: 0.85rem;
@@ -145,7 +152,7 @@ body.landing footer a { color: var(--link); }
 @media (max-width: 700px) {
   :root {
     --nav-height: 96px;
-    --subnav-height: 52px;
+    --subnav-height: 40px;
   }
   nav {
     flex-wrap: wrap;
@@ -163,20 +170,23 @@ body.landing footer a { color: var(--link); }
     overflow-x: visible;
     white-space: normal;
     height: auto;
-    min-height: var(--subnav-height);
-    padding: 0.3rem 0.5rem;
-    align-content: center;
-    row-gap: 0.15rem;
+    min-height: 0;
+    padding: 0.1rem 0.4rem;
+    align-content: flex-start;
+    row-gap: 0;
   }
   .subnav a {
     flex: 0 0 auto;
-    font-size: 0.82rem;
-    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+    padding: 0.12rem 0.4rem;
   }
-  /* Wrapped rows need a taller reserved strip so links don't sit on the
-     chart; --subnav-height also drives main padding-top and img max-height. */
+  /* Hug the wrapped rows; reserve only as much main padding as the
+     wrapped strip actually needs so the chart isn't pushed down. */
   body.has-subnav {
-    --subnav-height: 148px;
+    --subnav-height: 64px;
+  }
+  body.has-subnav:has(.subnav a:nth-of-type(10)) {
+    --subnav-height: 84px;
   }
   .subnav-label {
     /* The parent nav tab above is already highlighted as active, so this

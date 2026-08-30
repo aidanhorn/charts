@@ -83,6 +83,22 @@ build_crypto_chart <- function(coin_id, title_text, colour, price_digits = 0) {
   list(plot = plot, latest = latest)
 }
 
+# Linear y-axis for commodity prices. If the visible window spans a large
+# relative range (low is less than half the high), pin the axis at zero so
+# the chart doesn't exaggerate moves. Tight bands keep ggplot's default zoom.
+scale_y_price <- function(price, labels) {
+  price <- price[is.finite(price)]
+  lo <- if (length(price)) min(price) else NA_real_
+  hi <- if (length(price)) max(price) else NA_real_
+  pin_zero <- is.finite(lo) && is.finite(hi) && lo >= 0 && hi > 0 && (lo / hi) < 0.5
+  if (pin_zero) {
+    scale_y_continuous(labels = labels, limits = c(0, NA),
+                       expand = expansion(mult = c(0, 0.05)))
+  } else {
+    scale_y_continuous(labels = labels)
+  }
+}
+
 # Fetches a FRED series via the official observations API (needs FRED_API_KEY
 # - a repo secret in CI, read from ~/.Renviron locally) and returns a styled
 # price chart. Requires httr2 to already be loaded by the calling script.
@@ -109,7 +125,7 @@ build_fred_chart <- function(series_id, title_text, y_label, colour,
 
   plot <- ggplot(d, aes(x = date, y = price)) +
     geom_line(colour = colour, linewidth = 0.7) +
-    scale_y_continuous(labels = function(v) paste0(value_prefix, fmt_price(v), value_suffix)) +
+    scale_y_price(d$price, function(v) paste0(value_prefix, fmt_price(v), value_suffix)) +
     labs(
       title = title_text,
       subtitle = sprintf("Latest: %s%s%s on %s", value_prefix, fmt_price(latest$price), value_suffix, format(latest$date, date_format)),
@@ -200,7 +216,7 @@ build_pinksheet_metal_chart <- function(csv_path, title_text, colour, tail_n = 1
 
   plot <- ggplot(d, aes(x = date, y = price)) +
     geom_line(colour = colour, linewidth = 0.7) +
-    scale_y_continuous(labels = function(v) paste0("$", fmt_price(v))) +
+    scale_y_price(d$price, function(v) paste0("$", fmt_price(v))) +
     labs(
       title = title_text,
       subtitle = sprintf("Latest: $%s on %s", fmt_price(latest$price), format(latest$date, "%b %Y")),

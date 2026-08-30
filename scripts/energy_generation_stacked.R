@@ -88,12 +88,16 @@ for (place in PLACES) {
   out_path <- sprintf("assets/energy/mix_%s.png", place$slug)
   p <- build_mix_plot(place)
   p_port <- p +
-    theme(
-      plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT),
-      legend.text = element_text(size = 9)
-    ) +
+    theme(plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT)) +
     labs(caption = sub(" \\| ", "\n", p$labels$caption)) +
-    guides(fill = guide_legend(nrow = 2, reverse = FALSE))
+    guides(fill = guide_legend(
+      nrow = 2,
+      reverse = FALSE,
+      theme = theme(
+        legend.text = element_text(size = 16),
+        legend.key.size = unit(0.38, "in")
+      )
+    ))
   ggsave(out_path, p, width = 8, height = 4.5, dpi = 150, bg = CHART_BG, create.dir = TRUE)
   ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), p_port,
          width = 5, height = 6.5, dpi = 150, bg = CHART_BG)
