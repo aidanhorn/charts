@@ -65,7 +65,7 @@ ggsave(out_path, p, width = 10, height = 5.5, dpi = 150, bg = CHART_BG, create.d
 p_portrait <- p +
   theme(legend.position = "bottom",
         plot.margin = margin(t = 20, r = 2, b = 16, l = 2),
-        plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT)) +
+        plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT, margin = margin(t = 18))) +
   guides(fill = guide_colorbar(title.position = "top", barwidth = unit(3.2, "in"), barheight = unit(0.3, "in")))
 ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), p_portrait,
        width = 6, height = 7, dpi = 150, bg = CHART_BG, create.dir = TRUE)

@@ -28,6 +28,9 @@ p <- ggplot(d, aes(x = date, y = price)) +
   ) +
   theme_dark_chart()
 
-save_variants(p, out_path, land_w = 8, land_h = 4.5, port_w = 5, port_h = 8)
+# Shorter than other portrait charts (port_h=8 elsewhere) - this page has an
+# extra sub-nav bar above it (Oil/Copper), so less vertical space is
+# available before scrolling would be needed.
+save_variants(p, out_path, land_w = 8, land_h = 4.5, port_w = 5, port_h = 6.5)
 
 cat("Updated", out_path, "- latest copper price: $", latest$price, "as of", format(latest$date, "%b %Y"), "\n")

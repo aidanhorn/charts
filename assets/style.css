@@ -58,7 +58,7 @@ nav a.home { color: var(--text); font-weight: 700; margin-right: 0.5rem; }
 .subnav .subnav-label {
   color: var(--text);
   opacity: 0.85;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   margin-right: 0.5rem;
 }
 .subnav a {
@@ -159,9 +159,13 @@ body.landing footer a { color: var(--link); }
     padding: 0.35rem 0.6rem;
   }
   .subnav {
-    flex-wrap: wrap;
     overflow-x: visible;
-    white-space: normal;
-    align-content: center;
+  }
+  .subnav-label {
+    /* The parent nav tab above is already highlighted as active, so this
+       label is redundant here - drop it rather than risk it wrapping the
+       subnav onto a second row, which would overflow its fixed height and
+       cut into the chart below (main's padding-top assumes one row). */
+    display: none;
   }
 }
