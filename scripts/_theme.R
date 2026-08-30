@@ -87,7 +87,8 @@ build_crypto_chart <- function(coin_id, title_text, colour, price_digits = 0) {
 # - a repo secret in CI, read from ~/.Renviron locally) and returns a styled
 # price chart. Requires httr2 to already be loaded by the calling script.
 build_fred_chart <- function(series_id, title_text, y_label, colour,
-                              date_format = "%Y-%m-%d", tail_n = NULL, price_digits = 0) {
+                              date_format = "%Y-%m-%d", tail_n = NULL, price_digits = 0,
+                              value_prefix = "$", value_suffix = "") {
   api_key <- Sys.getenv("FRED_API_KEY")
   if (!nzchar(api_key)) stop("FRED_API_KEY environment variable is not set")
 
@@ -108,12 +109,71 @@ build_fred_chart <- function(series_id, title_text, y_label, colour,
 
   plot <- ggplot(d, aes(x = date, y = price)) +
     geom_line(colour = colour, linewidth = 0.7) +
+    scale_y_continuous(labels = function(v) paste0(value_prefix, fmt_price(v), value_suffix)) +
+    labs(
+      title = title_text,
+      subtitle = sprintf("Latest: %s%s%s on %s", value_prefix, fmt_price(latest$price), value_suffix, format(latest$date, date_format)),
+      x = NULL, y = y_label,
+      caption = sprintf("Source: FRED (%s) | charts.aidanhorn.co.za | auto-updated", series_id)
+    ) +
+    theme_dark_chart()
+
+  list(plot = plot, latest = latest)
+}
+
+# Fetches/accumulates gold or silver prices via GoldAPI.io (needs
+# GOLD_API_IO - a repo secret in CI, read from ~/.Renviron locally). Unlike
+# every other commodity here, GoldAPI.io's historical endpoint is one date
+# per call (no range query), so this accumulates one row per `step_months`
+# into a CSV committed alongside the chart, fetching only whichever
+# dates aren't in it yet. The free tier's actual monthly quota turned out to
+# be far smaller than advertised (confirmed: a plain 8-year monthly backfill
+# - ~97 calls - exhausted it immediately), so this defaults to a shallow
+# quarterly, 2-year backfill rather than the 8-year monthly depth every
+# other commodity script uses; deepen it gradually (raise years_back and/or
+# lower step_months) once real quota headroom is confirmed month to month.
+# Requires httr2 to already be loaded.
+build_goldapi_chart <- function(metal_symbol, csv_path, title_text, colour, years_back = 2, step_months = 3) {
+  api_key <- Sys.getenv("GOLD_API_IO")
+  if (!nzchar(api_key)) stop("GOLD_API_IO environment variable is not set")
+
+  fetch_price <- function(date) {
+    resp <- httr2::request(sprintf("https://www.goldapi.io/api/%s/USD/%s", metal_symbol, format(date, "%Y%m%d"))) |>
+      httr2::req_headers(`x-access-token` = api_key) |>
+      httr2::req_perform()
+    httr2::resp_body_json(resp)$price
+  }
+
+  if (file.exists(csv_path)) {
+    d <- read.csv(csv_path, stringsAsFactors = FALSE)
+    d$date <- as.Date(d$date)
+  } else {
+    d <- data.frame(date = as.Date(character()), price = numeric())
+  }
+
+  today <- Sys.Date()
+  wanted <- seq(as.Date(format(today, "%Y-%m-01")), by = sprintf("-%d month", step_months), length.out = (years_back * 12) %/% step_months + 1)
+  wanted <- sort(wanted[wanted <= today])
+  missing <- wanted[!wanted %in% d$date]
+
+  for (i in seq_along(missing)) {
+    dt <- missing[i]
+    d <- rbind(d, data.frame(date = dt, price = fetch_price(dt)))
+  }
+  d <- d[order(d$date), ]
+  write.csv(d, csv_path, row.names = FALSE)
+
+  latest <- d[nrow(d), ]
+  fmt_price <- function(v) formatC(v, format = "f", digits = 0, big.mark = " ")
+
+  plot <- ggplot(d, aes(x = date, y = price)) +
+    geom_line(colour = colour, linewidth = 0.7) +
     scale_y_continuous(labels = function(v) paste0("$", fmt_price(v))) +
     labs(
       title = title_text,
-      subtitle = sprintf("Latest: $%s on %s", fmt_price(latest$price), format(latest$date, date_format)),
-      x = NULL, y = y_label,
-      caption = sprintf("Source: FRED (%s) | charts.aidanhorn.co.za | auto-updated", series_id)
+      subtitle = sprintf("Latest: $%s on %s", fmt_price(latest$price), format(latest$date, "%b %Y")),
+      x = NULL, y = "USD/troy oz",
+      caption = "Source: GoldAPI.io (LBMA) | charts.aidanhorn.co.za | auto-updated"
     ) +
     theme_dark_chart()
 

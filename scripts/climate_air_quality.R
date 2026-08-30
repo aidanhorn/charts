@@ -81,7 +81,11 @@ p_portrait <- p +
                            nrow(d), GRID_DEG, GRID_DEG, format(latest_reading, "%Y-%m-%d"))) +
   theme(legend.position = "bottom",
         plot.margin = margin(t = 20, r = 2, b = 16, l = 2),
-        plot.subtitle = element_text(lineheight = 1.4),
+        # Panel (map) stays flush with the plot.margin above, but title/
+        # subtitle get their own left padding via the text element's own
+        # margin, independent of the panel's width.
+        plot.title = element_text(margin = margin(b = 10, l = 16)),
+        plot.subtitle = element_text(lineheight = 1.4, margin = margin(b = 14, l = 16)),
         plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT, margin = margin(t = 18))) +
   guides(fill = guide_colorbar(title.position = "top", barwidth = unit(3.2, "in"), barheight = unit(0.3, "in")))
 ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), p_portrait,

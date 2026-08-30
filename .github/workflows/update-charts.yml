@@ -85,6 +85,30 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: Rscript scripts/commodities_corn.R
 
+      - name: Update commodities (soybeans) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: Rscript scripts/commodities_soybeans.R
+
+      - name: Update commodities (aluminum) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: Rscript scripts/commodities_aluminum.R
+
+      - name: Update commodities (cocoa) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: Rscript scripts/commodities_cocoa.R
+
+      - name: Update commodities (cotton) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: Rscript scripts/commodities_cotton.R
+
       - name: Commit updated chart(s)
         run: |
           git config user.name "github-actions[bot]"
