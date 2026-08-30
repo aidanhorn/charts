@@ -49,6 +49,23 @@ save_variants <- function(plot, path, land_w, land_h, port_w, port_h) {
   ggsave(portrait_path, plot_portrait, width = port_w, height = port_h, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 }
 
+# Rolling calendar window so line charts don't keep compressing as history
+# accumulates. Start is N years before *today*, not N observations from the
+# series end (weekends/gaps would otherwise stretch the window).
+years_ago <- function(n) {
+  as.Date(seq(Sys.Date(), by = paste0("-", as.integer(n), " years"), length.out = 2)[2])
+}
+
+scale_x_window <- function(start, datetime = FALSE) {
+  if (datetime) {
+    scale_x_datetime(limits = c(as.POSIXct(start), NA),
+                     expand = expansion(mult = c(0.01, 0.03)))
+  } else {
+    scale_x_date(limits = c(start, NA),
+                 expand = expansion(mult = c(0.01, 0.03)))
+  }
+}
+
 # Fetches daily USD price history for a CoinGecko coin id (free tier caps
 # daily-interval history at 365 days) and returns a log-scale price chart,
 # styled consistently across all crypto pillars. Requires httr2 to already
@@ -63,6 +80,8 @@ build_crypto_chart <- function(coin_id, title_text, colour, price_digits = 0) {
     time = as.POSIXct(sapply(prices, `[[`, 1) / 1000, origin = "1970-01-01", tz = "UTC"),
     price = sapply(prices, `[[`, 2)
   )
+  start <- years_ago(1)
+  d <- d[as.Date(d$time, tz = "UTC") >= start, ]
   latest <- d[nrow(d), ]
 
   # price_digits > 0 for sub-$5 coins (e.g. XRP) - whole-dollar formatting
@@ -71,6 +90,7 @@ build_crypto_chart <- function(coin_id, title_text, colour, price_digits = 0) {
 
   plot <- ggplot(d, aes(x = time, y = price)) +
     geom_line(colour = colour, linewidth = 0.7) +
+    scale_x_window(start, datetime = TRUE) +
     scale_y_log10(labels = function(v) paste0("$", fmt_price(v))) +
     labs(
       title = title_text,
@@ -103,7 +123,7 @@ scale_y_price <- function(price, labels) {
 # - a repo secret in CI, read from ~/.Renviron locally) and returns a styled
 # price chart. Requires httr2 to already be loaded by the calling script.
 build_fred_chart <- function(series_id, title_text, y_label, colour,
-                              date_format = "%Y-%m-%d", tail_n = NULL, price_digits = 0,
+                              date_format = "%Y-%m-%d", window_years = NULL, price_digits = 0,
                               value_prefix = "$", value_suffix = "") {
   api_key <- Sys.getenv("FRED_API_KEY")
   if (!nzchar(api_key)) stop("FRED_API_KEY environment variable is not set")
@@ -118,13 +138,15 @@ build_fred_chart <- function(series_id, title_text, y_label, colour,
     price = suppressWarnings(as.numeric(sapply(obs, `[[`, "value")))  # FRED marks missing periods as "."
   )
   d <- d[!is.na(d$price), ]
-  if (!is.null(tail_n)) d <- tail(d, tail_n)
+  start <- if (!is.null(window_years)) years_ago(window_years) else min(d$date)
+  d <- d[d$date >= start, ]
   latest <- d[nrow(d), ]
 
   fmt_price <- function(v) formatC(v, format = "f", digits = price_digits, big.mark = " ")
 
   plot <- ggplot(d, aes(x = date, y = price)) +
     geom_line(colour = colour, linewidth = 0.7) +
+    scale_x_window(start) +
     scale_y_price(d$price, function(v) paste0(value_prefix, fmt_price(v), value_suffix)) +
     labs(
       title = title_text,
@@ -206,16 +228,18 @@ update_pinksheet_precious_csvs <- function(gold_path = "data/gold_usd.csv",
   invisible(list(gold = d_gold, silver = d_silver, url = url))
 }
 
-build_pinksheet_metal_chart <- function(csv_path, title_text, colour, tail_n = 12 * 8) {
+build_pinksheet_metal_chart <- function(csv_path, title_text, colour, window_years = 8) {
   update_pinksheet_precious_csvs()
   d <- read.csv(csv_path, stringsAsFactors = FALSE)
   d$date <- as.Date(d$date)
-  if (!is.null(tail_n)) d <- tail(d, tail_n)
+  start <- years_ago(window_years)
+  d <- d[d$date >= start, ]
   latest <- d[nrow(d), ]
   fmt_price <- function(v) formatC(v, format = "f", digits = 0, big.mark = " ")
 
   plot <- ggplot(d, aes(x = date, y = price)) +
     geom_line(colour = colour, linewidth = 0.7) +
+    scale_x_window(start) +
     scale_y_price(d$price, function(v) paste0("$", fmt_price(v))) +
     labs(
       title = title_text,

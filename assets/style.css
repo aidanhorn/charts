@@ -186,7 +186,7 @@ body.landing footer a { color: var(--link); }
     overflow-x: visible;
     white-space: normal;
     min-height: 0;
-    padding: 0.22rem 0.45rem;
+    padding: 0.3rem 0.45rem;
     align-content: center;
     align-items: center;
     row-gap: 0.12rem;
@@ -196,7 +196,7 @@ body.landing footer a { color: var(--link); }
     flex: 0 0 auto;
     font-size: 0.9rem;
     line-height: 1.25;
-    padding: 0.22rem 0.5rem;
+    padding: 0.28rem 0.5rem;
   }
   main,
   body.has-subnav main {

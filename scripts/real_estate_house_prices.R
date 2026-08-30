@@ -10,7 +10,16 @@ out_path <- "assets/real_estate/house_prices.png"
 COUNTRIES <- c(USA = "United States", GBR = "United Kingdom", DEU = "Germany",
                AUS = "Australia", CHN = "China", ZAF = "South Africa")
 
-url <- "https://sdmx.oecd.org/public/rest/data/OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,/all?format=csvfilewithlabels&startPeriod=2015-Q1"
+plot_years <- 10
+fetch_start <- years_ago(plot_years + 1)  # extra year so YoY can be computed at the window start
+oecd_quarter <- function(d) {
+  q <- (as.integer(format(d, "%m")) - 1L) %/% 3L + 1L
+  sprintf("%d-Q%d", as.integer(format(d, "%Y")), q)
+}
+url <- sprintf(
+  "https://sdmx.oecd.org/public/rest/data/OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,/all?format=csvfilewithlabels&startPeriod=%s",
+  oecd_quarter(fetch_start)
+)
 raw <- read.csv(url, stringsAsFactors = FALSE, check.names = FALSE)
 
 d <- raw[raw$MEASURE == "RHP" & raw$FREQ == "Q" & raw$REF_AREA %in% names(COUNTRIES), ]
@@ -29,6 +38,7 @@ d <- d[order(d$country, d$date), ]
 
 d$yoy_growth <- ave(d$index, d$country, FUN = function(x) x / c(rep(NA, 4), head(x, -4)) * 100 - 100)
 d <- d[!is.na(d$yoy_growth), ]
+d <- d[d$date >= years_ago(plot_years), ]
 
 latest_date <- max(d$date, na.rm = TRUE)
 latest_quarter <- sprintf("%d Q%d", as.integer(format(latest_date, "%Y")), (as.integer(format(latest_date, "%m")) - 1) %/% 3 + 1)
@@ -38,6 +48,7 @@ build_plot <- function(ncol) {
     geom_hline(yintercept = 0, colour = CHART_TEXT_DIM, linewidth = 0.3) +
     geom_line(colour = "#58a6ff", linewidth = 0.7) +
     facet_wrap(~country, ncol = ncol) +
+    scale_x_window(years_ago(plot_years)) +
     scale_y_continuous(labels = function(v) paste0(v, "%")) +
     labs(
       title = "Real (CPI-adjusted) house price growth, year-on-year",

@@ -11,7 +11,7 @@ source("scripts/_theme.R")
 
 out_path <- "assets/commodities/cotton.png"
 result <- build_fred_chart("PCOTTINDUSDM", "Cotton (US cents/lb)", "US cents/lb", "#a8d5e5",
-                            date_format = "%b %Y", tail_n = 12 * 8, price_digits = 1,
+                            date_format = "%b %Y", window_years = 8, price_digits = 1,
                             value_prefix = "", value_suffix = "¢")
 save_variants(result$plot, out_path, land_w = 8, land_h = 4.5, port_w = 5, port_h = 6.5)
 
