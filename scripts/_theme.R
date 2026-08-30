@@ -49,6 +49,40 @@ save_variants <- function(plot, path, land_w, land_h, port_w, port_h) {
   ggsave(portrait_path, plot_portrait, width = port_w, height = port_h, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 }
 
+# Fetches daily USD price history for a CoinGecko coin id (free tier caps
+# daily-interval history at 365 days) and returns a log-scale price chart,
+# styled consistently across all crypto pillars. Requires httr2 to already
+# be loaded by the calling script.
+build_crypto_chart <- function(coin_id, title_text, colour, price_digits = 0) {
+  resp <- httr2::request(sprintf("https://api.coingecko.com/api/v3/coins/%s/market_chart", coin_id)) |>
+    httr2::req_url_query(vs_currency = "usd", days = "365", interval = "daily") |>
+    httr2::req_perform()
+
+  prices <- httr2::resp_body_json(resp)$prices
+  d <- data.frame(
+    time = as.POSIXct(sapply(prices, `[[`, 1) / 1000, origin = "1970-01-01", tz = "UTC"),
+    price = sapply(prices, `[[`, 2)
+  )
+  latest <- d[nrow(d), ]
+
+  # price_digits > 0 for sub-$5 coins (e.g. XRP) - whole-dollar formatting
+  # would otherwise round the price to something meaningless like "$1".
+  fmt_price <- function(v) formatC(v, format = "f", digits = price_digits, big.mark = " ")
+
+  plot <- ggplot(d, aes(x = time, y = price)) +
+    geom_line(colour = colour, linewidth = 0.7) +
+    scale_y_log10(labels = function(v) paste0("$", fmt_price(v))) +
+    labs(
+      title = title_text,
+      subtitle = sprintf("Latest: $%s on %s", fmt_price(latest$price), format(latest$time, "%Y-%m-%d")),
+      x = NULL, y = "Price (log scale)",
+      caption = "Source: CoinGecko | charts.aidanhorn.co.za | auto-updated"
+    ) +
+    theme_dark_chart()
+
+  list(plot = plot, latest = latest)
+}
+
 theme_dark_void <- function(base_size = 12) {
   theme_void(base_size = base_size) %+replace%
     theme(

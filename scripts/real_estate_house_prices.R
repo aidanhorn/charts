@@ -54,8 +54,13 @@ build_plot <- function(ncol) {
 # ncol change on the same facet_wrap, so a taller/narrower canvas actually
 # reads well rather than squeezing 3-wide facets into a phone screen.
 ggsave(out_path, build_plot(ncol = 3), width = 10, height = 6, dpi = 150, bg = CHART_BG, create.dir = TRUE)
-ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path),
-       build_plot(ncol = 2) + theme(plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT)),
+# Wrap the (long) caption after the first " | " so it doesn't overflow the
+# narrower portrait canvas at the larger mobile caption size - ggplot2
+# doesn't auto-wrap plot captions (same issue hit on the other pillars).
+p_re_portrait <- build_plot(ncol = 2) +
+  labs(caption = sub(" \\| ", "\n", "Source: OECD Analytical House Prices Indicators | charts.aidanhorn.co.za | auto-updated")) +
+  theme(plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT))
+ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), p_re_portrait,
        width = 6, height = 9, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 
 cat("Updated", out_path, "- countries:", paste(unique(d$country), collapse = ", "), "\n")

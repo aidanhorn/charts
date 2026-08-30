@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# Regenerates the BTC price chart (log y-axis) for charts.aidanhorn.co.za.
+# Regenerates the Bitcoin price chart for charts.aidanhorn.co.za.
 # Data: CoinGecko public API (free, no key required).
 
 suppressMessages({
@@ -10,30 +10,10 @@ suppressMessages({
 source("scripts/_theme.R")
 
 out_path <- "assets/crypto/btc.png"
+result <- build_crypto_chart("bitcoin", "Bitcoin (BTC/USD)", "#f2a900")
 
-resp <- request("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart") |>
-  req_url_query(vs_currency = "usd", days = "365", interval = "daily") |>  # free tier caps daily-interval history at 365 days
-  req_perform()
+# Shorter portrait height (6.5, not 8) - this page carries a Crypto sub-nav
+# bar, leaving less vertical room before scrolling would be needed.
+save_variants(result$plot, out_path, land_w = 8, land_h = 4.5, port_w = 5, port_h = 6.5)
 
-prices <- resp_body_json(resp)$prices
-d <- data.frame(
-  time = as.POSIXct(sapply(prices, `[[`, 1) / 1000, origin = "1970-01-01", tz = "UTC"),
-  price = sapply(prices, `[[`, 2)
-)
-
-latest <- d[nrow(d), ]
-
-p <- ggplot(d, aes(x = time, y = price)) +
-  geom_line(colour = "#f2a900", linewidth = 0.7) +
-  scale_y_log10(labels = function(v) paste0("$", formatC(v, format = "d", big.mark = " "))) +
-  labs(
-    title = "Bitcoin (BTC/USD)",
-    subtitle = sprintf("Latest: $%s on %s", formatC(latest$price, format = "d", big.mark = " "), format(latest$time, "%Y-%m-%d")),
-    x = NULL, y = "Price (log scale)",
-    caption = "Source: CoinGecko | charts.aidanhorn.co.za | auto-updated"
-  ) +
-  theme_dark_chart()
-
-save_variants(p, out_path, land_w = 8, land_h = 4.5, port_w = 5, port_h = 8)
-
-cat("Updated", out_path, "- latest BTC price: $", formatC(latest$price, format = "d", big.mark = " "), "as of", format(latest$time, "%Y-%m-%d"), "\n")
+cat("Updated", out_path, "- latest BTC price: $", formatC(result$latest$price, format = "d", big.mark = " "), "as of", format(result$latest$time, "%Y-%m-%d"), "\n")

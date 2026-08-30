@@ -25,6 +25,22 @@ jobs:
         if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
         run: Rscript scripts/crypto_btc.R
 
+      - name: Update crypto (ETH) chart
+        if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
+        run: Rscript scripts/crypto_eth.R
+
+      - name: Update crypto (SOL) chart
+        if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
+        run: Rscript scripts/crypto_sol.R
+
+      - name: Update crypto (XRP) chart
+        if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
+        run: Rscript scripts/crypto_xrp.R
+
+      - name: Update crypto (LTC) chart
+        if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
+        run: Rscript scripts/crypto_ltc.R
+
       - name: Update climate (air quality) chart
         if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
         env:

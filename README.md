@@ -2,13 +2,17 @@
 
 Source for [charts.aidanhorn.co.za](https://charts.aidanhorn.co.za) — a small set of automated, self-updating charts across a few genuinely interesting data domains, each pulling from a real public API on its own schedule via GitHub Actions.
 
-Site is a set of full-screen pages with a top nav bar, plus a sub-nav for sections with multiple pages (Commodities) — see `index.html` (landing page), `crypto.html`, `climate.html`, `energy.html`, `real-estate.html`, `commodities.html`/`commodities-copper.html` (Oil/Copper sub-pages). `traffic.html` still exists but is unlinked from all navigation (deferred, see below). Shared styling in `assets/style.css`, shared dark/high-contrast ggplot2 theme in `scripts/_theme.R`.
+Site is a set of full-screen pages with a top nav bar, plus a sub-nav for sections with multiple pages (Crypto, Commodities) — see `index.html` (landing page), `crypto.html`/`crypto-eth.html`/`crypto-sol.html`/`crypto-xrp.html`/`crypto-ltc.html` (BTC/ETH/SOL/XRP/LTC sub-pages), `climate.html`, `energy.html`, `real-estate.html`, `commodities.html`/`commodities-copper.html` (Oil/Copper sub-pages). `traffic.html` still exists but is unlinked from all navigation (deferred, see below). Shared styling in `assets/style.css`, shared dark/high-contrast ggplot2 theme + crypto-chart builder in `scripts/_theme.R`.
 
 ## Pillars
 
 | Pillar | Script | Source | Cadence | Status |
 |---|---|---|---|---|
-| Crypto (BTC/USD, log scale) | [crypto_btc.R](scripts/crypto_btc.R) | [CoinGecko](https://www.coingecko.com/en/api) (free tier) | Daily | Live |
+| Crypto — Bitcoin | [crypto_btc.R](scripts/crypto_btc.R) | [CoinGecko](https://www.coingecko.com/en/api) (free tier) | Daily | Live |
+| Crypto — Ethereum | [crypto_eth.R](scripts/crypto_eth.R) | CoinGecko (free tier) | Daily | Live |
+| Crypto — Solana | [crypto_sol.R](scripts/crypto_sol.R) | CoinGecko (free tier) | Daily | Live |
+| Crypto — XRP | [crypto_xrp.R](scripts/crypto_xrp.R) | CoinGecko (free tier) | Daily | Live |
+| Crypto — Litecoin | [crypto_ltc.R](scripts/crypto_ltc.R) | CoinGecko (free tier) | Daily | Live |
 | Climate (global PM2.5 air quality, grid heatmap) | [climate_air_quality.R](scripts/climate_air_quality.R) | [OpenAQ](https://openaq.org/) v3 API (needs a free `OPENAQ_API_KEY` repo secret) | Daily | Live |
 | Commodities — Oil (Brent crude) | [commodities_oil.R](scripts/commodities_oil.R) | [FRED](https://fred.stlouisfed.org/) (free CSV, no key) | Daily | Live |
 | Commodities — Copper | [commodities_copper.R](scripts/commodities_copper.R) | [FRED](https://fred.stlouisfed.org/) (PCOPPUSDM, free CSV, no key) | Monthly | Live |
@@ -17,6 +21,8 @@ Site is a set of full-screen pages with a top nav bar, plus a sub-nav for sectio
 | Traffic (global congestion) | _not built_ | [TomTom Traffic Index](https://www.tomtom.com/traffic-index/) | Annual | Deferred, unlinked from nav — ranking data is client-rendered with no accessible free endpoint found yet; lowest priority pillar |
 
 All data sources are free/public — no paid feeds. See `.github/workflows/update-charts.yml` for the scheduling (crypto/climate/oil run daily; energy/real-estate/copper run monthly; `workflow_dispatch` runs everything for manual testing).
+
+Pages with a sub-nav (Crypto, Commodities) use a shorter portrait chart height (`port_h`) than single-page pillars, since the extra sub-nav bar leaves less vertical room on mobile before scrolling would be needed.
 
 ## Why this exists
 
