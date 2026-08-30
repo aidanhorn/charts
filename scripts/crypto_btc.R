@@ -38,6 +38,6 @@ p <- ggplot(d, aes(x = time, y = price)) +
     plot.caption = element_text(colour = "grey50", size = 8)
   )
 
-ggsave(out_path, p, width = 8, height = 4.5, dpi = 150, bg = "white")
+ggsave(out_path, p, width = 8, height = 4.5, dpi = 150, bg = "white", create.dir = TRUE)
 
 cat("Updated", out_path, "- latest BTC price: $", formatC(latest$price, format = "d", big.mark = ","), "as of", format(latest$time, "%Y-%m-%d"), "\n")
