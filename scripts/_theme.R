@@ -31,10 +31,11 @@ theme_dark_chart <- function(base_size = 12) {
 theme_dark_void <- function(base_size = 12) {
   theme_void(base_size = base_size) %+replace%
     theme(
+      plot.margin = margin(t = 26, r = 16, b = 26, l = 16),
       plot.background = element_rect(fill = CHART_BG, colour = NA),
       plot.title = element_text(colour = CHART_TEXT, face = "bold", hjust = 0, margin = margin(b = 10)),
       plot.subtitle = element_text(colour = CHART_TEXT_DIM, hjust = 0, margin = margin(b = 14)),
-      plot.caption = element_text(colour = CHART_TEXT_DIM, size = 8, margin = margin(t = 14)),
+      plot.caption = element_text(colour = CHART_TEXT_DIM, size = 8, margin = margin(t = 4)),
       legend.background = element_rect(fill = CHART_BG, colour = NA),
       legend.text = element_text(colour = CHART_TEXT_DIM),
       legend.title = element_text(colour = CHART_TEXT, margin = margin(b = 10))

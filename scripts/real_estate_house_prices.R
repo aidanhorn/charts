@@ -34,7 +34,7 @@ latest_date <- max(d$date, na.rm = TRUE)
 latest_quarter <- sprintf("%d Q%d", as.integer(format(latest_date, "%Y")), (as.integer(format(latest_date, "%m")) - 1) %/% 3 + 1)
 
 p <- ggplot(d, aes(x = date, y = yoy_growth)) +
-  geom_hline(yintercept = 0, colour = CHART_GRID, linewidth = 0.3) +
+  geom_hline(yintercept = 0, colour = CHART_TEXT_DIM, linewidth = 0.3) +
   geom_line(colour = "#58a6ff", linewidth = 0.7) +
   facet_wrap(~country, ncol = 3) +
   scale_y_continuous(labels = function(v) paste0(v, "%")) +

@@ -34,20 +34,28 @@ d <- data.frame(
 )
 d <- d[!is.na(d$lon) & !is.na(d$lat) & !is.na(d$pm25) & d$pm25 >= 0 & d$pm25 < 500, ]
 
+# Bin into a coarse lat/lon grid and average PM2.5 per cell, rather than
+# plotting 1900+ individual overlapping points.
+GRID_DEG <- 2.5
+d$lon_bin <- floor(d$lon / GRID_DEG) * GRID_DEG + GRID_DEG / 2
+d$lat_bin <- floor(d$lat / GRID_DEG) * GRID_DEG + GRID_DEG / 2
+grid <- aggregate(pm25 ~ lon_bin + lat_bin, data = d, FUN = mean)
+
 world <- map_data("world")
 
 p <- ggplot() +
   geom_polygon(data = world, aes(x = long, y = lat, group = group),
                fill = CHART_PANEL, colour = CHART_GRID, linewidth = 0.1) +
-  geom_point(data = d, aes(x = lon, y = lat, colour = pm25), size = 1.3, alpha = 0.85) +
+  geom_tile(data = grid, aes(x = lon_bin, y = lat_bin, fill = pm25),
+            width = GRID_DEG, height = GRID_DEG, alpha = 0.9) +
   coord_fixed(1.3) +
-  scale_colour_gradientn(colours = c("#4a90d9", "#e0b23c", "#d94a4a"),
-                          limits = c(0, 150), oob = scales::squish,
-                          labels = function(v) paste0(v, " µg/m³")) +
+  scale_fill_gradientn(colours = c("#4a90d9", "#e0b23c", "#d94a4a"),
+                        limits = c(0, 150), oob = scales::squish,
+                        labels = function(v) paste0(v, " µg/m³")) +
   labs(
     title = "Global air quality: PM2.5, latest readings",
-    subtitle = sprintf("%d stations, most recent measurement per sensor", nrow(d)),
-    colour = "PM2.5",
+    subtitle = sprintf("%d stations, averaged into a %.1f°×%.1f° grid", nrow(d), GRID_DEG, GRID_DEG),
+    fill = "PM2.5",
     caption = "Source: OpenAQ | charts.aidanhorn.co.za | auto-updated"
   ) +
   theme_dark_void() +

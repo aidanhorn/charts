@@ -25,10 +25,10 @@ latest <- d[nrow(d), ]
 
 p <- ggplot(d, aes(x = time, y = price)) +
   geom_line(colour = "#f2a900", linewidth = 0.7) +
-  scale_y_log10(labels = function(v) paste0("$", formatC(v, format = "d", big.mark = ","))) +
+  scale_y_log10(labels = function(v) paste0("$", formatC(v, format = "d", big.mark = " "))) +
   labs(
     title = "Bitcoin (BTC/USD)",
-    subtitle = sprintf("Latest: $%s on %s", formatC(latest$price, format = "d", big.mark = ","), format(latest$time, "%Y-%m-%d")),
+    subtitle = sprintf("Latest: $%s on %s", formatC(latest$price, format = "d", big.mark = " "), format(latest$time, "%Y-%m-%d")),
     x = NULL, y = "Price (log scale)",
     caption = "Source: CoinGecko | charts.aidanhorn.co.za | auto-updated"
   ) +
@@ -36,4 +36,4 @@ p <- ggplot(d, aes(x = time, y = price)) +
 
 ggsave(out_path, p, width = 8, height = 4.5, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 
-cat("Updated", out_path, "- latest BTC price: $", formatC(latest$price, format = "d", big.mark = ","), "as of", format(latest$time, "%Y-%m-%d"), "\n")
+cat("Updated", out_path, "- latest BTC price: $", formatC(latest$price, format = "d", big.mark = " "), "as of", format(latest$time, "%Y-%m-%d"), "\n")
