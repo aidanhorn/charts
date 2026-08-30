@@ -167,15 +167,15 @@ body.landing footer a { color: var(--link); }
     flex-wrap: wrap;
     overflow-x: visible;
     white-space: normal;
-    padding: 0.1rem 0.35rem;
-    align-content: flex-start;
-    row-gap: 0;
-    column-gap: 0.1rem;
+    padding: 0.35rem 0.5rem;
+    align-content: center;
+    row-gap: 0.15rem;
+    column-gap: 0.15rem;
   }
   nav a {
-    font-size: 0.82rem;
-    line-height: 1.2;
-    padding: 0.08rem 0.45rem;
+    font-size: 0.85rem;
+    line-height: 1.25;
+    padding: 0.3rem 0.55rem;
   }
   .subnav {
     position: sticky;
@@ -186,17 +186,17 @@ body.landing footer a { color: var(--link); }
     overflow-x: visible;
     white-space: normal;
     min-height: 0;
-    padding: 0 0.3rem;
-    align-content: flex-start;
-    align-items: flex-start;
-    row-gap: 0;
-    column-gap: 0.1rem;
+    padding: 0.22rem 0.45rem;
+    align-content: center;
+    align-items: center;
+    row-gap: 0.12rem;
+    column-gap: 0.12rem;
   }
   .subnav a {
     flex: 0 0 auto;
-    font-size: 0.78rem;
-    line-height: 1.2;
-    padding: 0 0.35rem;
+    font-size: 0.82rem;
+    line-height: 1.25;
+    padding: 0.22rem 0.5rem;
   }
   main,
   body.has-subnav main {
