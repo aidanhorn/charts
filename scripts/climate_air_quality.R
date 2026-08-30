@@ -70,4 +70,18 @@ p <- ggplot() +
 
 ggsave(out_path, p, width = 10, height = 5.5, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 
+# Portrait: same treatment as the energy chart - bottom legend, title above
+# the bar, bar widened so labels don't overlap, canvas sized close to what
+# the content needs rather than leaving coord_fixed() centre it in a lot of
+# empty space. Subtitle is also explicitly wrapped onto two shorter lines -
+# ggplot2 doesn't auto-wrap plot subtitles, so the single-line landscape
+# version would otherwise run off the edge of a narrower canvas.
+p_portrait <- p +
+  labs(subtitle = sprintf("%d stations, %.1f°×%.1f° grid\nMost recent reading: %s",
+                           nrow(d), GRID_DEG, GRID_DEG, format(latest_reading, "%Y-%m-%d"))) +
+  theme(legend.position = "bottom") +
+  guides(fill = guide_colorbar(title.position = "top", barwidth = unit(3.2, "in"), barheight = unit(0.3, "in")))
+ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), p_portrait,
+       width = 6, height = 7.6, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+
 cat("Updated", out_path, "-", nrow(d), "stations\n")

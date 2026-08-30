@@ -34,6 +34,6 @@ p <- ggplot(d, aes(x = time, y = price)) +
   ) +
   theme_dark_chart()
 
-ggsave(out_path, p, width = 8, height = 4.5, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+save_variants(p, out_path, land_w = 8, land_h = 4.5, port_w = 5, port_h = 8)
 
 cat("Updated", out_path, "- latest BTC price: $", formatC(latest$price, format = "d", big.mark = " "), "as of", format(latest$time, "%Y-%m-%d"), "\n")

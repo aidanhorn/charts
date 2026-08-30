@@ -33,21 +33,28 @@ d <- d[!is.na(d$yoy_growth), ]
 latest_date <- max(d$date, na.rm = TRUE)
 latest_quarter <- sprintf("%d Q%d", as.integer(format(latest_date, "%Y")), (as.integer(format(latest_date, "%m")) - 1) %/% 3 + 1)
 
-p <- ggplot(d, aes(x = date, y = yoy_growth)) +
-  geom_hline(yintercept = 0, colour = CHART_TEXT_DIM, linewidth = 0.3) +
-  geom_line(colour = "#58a6ff", linewidth = 0.7) +
-  facet_wrap(~country, ncol = 3) +
-  scale_y_continuous(labels = function(v) paste0(v, "%")) +
-  labs(
-    title = "Real (CPI-adjusted) house price growth, year-on-year",
-    subtitle = sprintf("Latest quarter: %s", latest_quarter),
-    x = NULL, y = NULL,
-    caption = "Source: OECD Analytical House Prices Indicators | charts.aidanhorn.co.za | auto-updated"
-  ) +
-  theme_dark_chart() +
-  theme(strip.background = element_rect(fill = CHART_PANEL, colour = CHART_GRID),
-        strip.text = element_text(colour = CHART_TEXT))
+build_plot <- function(ncol) {
+  ggplot(d, aes(x = date, y = yoy_growth)) +
+    geom_hline(yintercept = 0, colour = CHART_TEXT_DIM, linewidth = 0.3) +
+    geom_line(colour = "#58a6ff", linewidth = 0.7) +
+    facet_wrap(~country, ncol = ncol) +
+    scale_y_continuous(labels = function(v) paste0(v, "%")) +
+    labs(
+      title = "Real (CPI-adjusted) house price growth, year-on-year",
+      subtitle = sprintf("Latest quarter: %s", latest_quarter),
+      x = NULL, y = NULL,
+      caption = "Source: OECD Analytical House Prices Indicators | charts.aidanhorn.co.za | auto-updated"
+    ) +
+    theme_dark_chart() +
+    theme(strip.background = element_rect(fill = CHART_PANEL, colour = CHART_GRID),
+          strip.text = element_text(colour = CHART_TEXT))
+}
 
-ggsave(out_path, p, width = 10, height = 6, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+# Landscape: 3 columns x 2 rows. Portrait: 2 columns x 3 rows - a straight
+# ncol change on the same facet_wrap, so a taller/narrower canvas actually
+# reads well rather than squeezing 3-wide facets into a phone screen.
+ggsave(out_path, build_plot(ncol = 3), width = 10, height = 6, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), build_plot(ncol = 2),
+       width = 6, height = 9, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 
 cat("Updated", out_path, "- countries:", paste(unique(d$country), collapse = ", "), "\n")

@@ -28,6 +28,18 @@ theme_dark_chart <- function(base_size = 12) {
     )
 }
 
+# Saves a landscape render (the default, desktop) plus a taller/narrower
+# "-portrait" sibling (for mobile, picked up via a <picture> media query in
+# each page). Use this when the same plot object works at either aspect
+# ratio (e.g. coord_fixed() maps just get more surrounding whitespace); for
+# layouts that need real structural changes at portrait width (e.g. fewer
+# facet columns), build two plot objects and call ggsave() directly instead.
+save_variants <- function(plot, path, land_w, land_h, port_w, port_h) {
+  ggsave(path, plot, width = land_w, height = land_h, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+  portrait_path <- sub("(\\.[a-zA-Z]+)$", "-portrait\\1", path)
+  ggsave(portrait_path, plot, width = port_w, height = port_h, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+}
+
 theme_dark_void <- function(base_size = 12) {
   theme_void(base_size = base_size) %+replace%
     theme(

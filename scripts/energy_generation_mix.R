@@ -55,4 +55,17 @@ p <- ggplot(world_map, aes(x = long, y = lat, group = group, fill = renewables_s
 
 ggsave(out_path, p, width = 10, height = 5.5, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 
+# Portrait: legend moves below the map (a right-hand legend would waste even
+# more of a narrow screen's width), title moved above the colour bar so it
+# doesn't crowd the "0%/25%/.../100%" labels, and the bar widened to fill
+# most of the available width so those labels don't overlap. Canvas height
+# is sized close to what the fixed-aspect map + legend + text actually need
+# - coord_fixed() otherwise vertically centres the whole block, leaving a
+# large empty gap above the title on a much taller canvas.
+p_portrait <- p +
+  theme(legend.position = "bottom") +
+  guides(fill = guide_colorbar(title.position = "top", barwidth = unit(3.2, "in"), barheight = unit(0.3, "in")))
+ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), p_portrait,
+       width = 6, height = 7, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+
 cat("Updated", out_path, "- latest year:", latest_year, "\n")

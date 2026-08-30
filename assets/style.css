@@ -83,6 +83,7 @@ main {
   align-items: center;
   justify-content: center;
 }
+main picture { display: contents; }
 main img {
   max-width: calc(100vw - 2rem);
   max-height: calc(100vh - var(--nav-height) - 2rem);
