@@ -173,7 +173,7 @@ body.landing footer a { color: var(--link); }
     column-gap: 0.15rem;
   }
   nav a {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     line-height: 1.25;
     padding: 0.3rem 0.55rem;
   }
@@ -194,7 +194,7 @@ body.landing footer a { color: var(--link); }
   }
   .subnav a {
     flex: 0 0 auto;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     line-height: 1.25;
     padding: 0.22rem 0.5rem;
   }
