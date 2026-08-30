@@ -22,7 +22,7 @@ p <- ggplot(d, aes(x = date, y = price)) +
   scale_y_continuous(labels = function(v) paste0("$", formatC(v, format = "d", big.mark = " "))) +
   labs(
     title = "Copper (USD/tonne)",
-    subtitle = sprintf("Latest: $%s on %s", formatC(latest$price, format = "d", big.mark = " "), format(latest$date, "%Y-%m")),
+    subtitle = sprintf("Latest: $%s on %s", formatC(latest$price, format = "d", big.mark = " "), format(latest$date, "%b %Y")),
     x = NULL, y = "USD/tonne",
     caption = "Source: FRED (PCOPPUSDM) | charts.aidanhorn.co.za | auto-updated"
   ) +
@@ -30,4 +30,4 @@ p <- ggplot(d, aes(x = date, y = price)) +
 
 save_variants(p, out_path, land_w = 8, land_h = 4.5, port_w = 5, port_h = 8)
 
-cat("Updated", out_path, "- latest copper price: $", latest$price, "as of", format(latest$date, "%Y-%m"), "\n")
+cat("Updated", out_path, "- latest copper price: $", latest$price, "as of", format(latest$date, "%b %Y"), "\n")

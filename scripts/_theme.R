@@ -6,6 +6,7 @@ CHART_PANEL <- "#161b22"
 CHART_GRID <- "#30363d"
 CHART_TEXT <- "#ffffff"
 CHART_TEXT_DIM <- "#d5dbe2"
+CHART_CAPTION_SIZE_PORTRAIT <- 11  # larger than the 8pt landscape default - legible on mobile
 
 theme_dark_chart <- function(base_size = 12) {
   theme_bw(base_size = base_size) %+replace%
@@ -37,7 +38,15 @@ theme_dark_chart <- function(base_size = 12) {
 save_variants <- function(plot, path, land_w, land_h, port_w, port_h) {
   ggsave(path, plot, width = land_w, height = land_h, dpi = 150, bg = CHART_BG, create.dir = TRUE)
   portrait_path <- sub("(\\.[a-zA-Z]+)$", "-portrait\\1", path)
-  ggsave(portrait_path, plot, width = port_w, height = port_h, dpi = 150, bg = CHART_BG, create.dir = TRUE)
+  plot_portrait <- plot + theme(plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT))
+  # The larger portrait caption size can overflow a narrow canvas on one line
+  # (ggplot2 doesn't auto-wrap it) - break after the first " | " so
+  # "Source: X" sits on its own line above "site | auto-updated".
+  current_caption <- plot$labels$caption
+  if (!is.null(current_caption) && grepl(" \\| ", current_caption)) {
+    plot_portrait <- plot_portrait + labs(caption = sub(" \\| ", "\n", current_caption))
+  }
+  ggsave(portrait_path, plot_portrait, width = port_w, height = port_h, dpi = 150, bg = CHART_BG, create.dir = TRUE)
 }
 
 theme_dark_void <- function(base_size = 12) {

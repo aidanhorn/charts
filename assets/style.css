@@ -56,8 +56,8 @@ nav a.home { color: var(--text); font-weight: 700; margin-right: 0.5rem; }
   z-index: 9;
 }
 .subnav .subnav-label {
-  color: var(--text-dim);
-  opacity: 0.6;
+  color: var(--text);
+  opacity: 0.85;
   font-size: 0.8rem;
   margin-right: 0.5rem;
 }
@@ -135,3 +135,33 @@ body.landing footer {
   padding-top: 1rem;
 }
 body.landing footer a { color: var(--link); }
+
+/* Mobile: the nav previously scrolled horizontally (overflow-x: auto),
+   which hid items past the fold - you had to know to scroll right to find
+   "Commodities". Wrap it onto two rows instead, so every tab is visible
+   immediately with no interaction needed. --nav-height grows to fit two
+   rows, and everything else (main's padding-top, the img max-height calc)
+   already derives from that variable, so nothing else needs to change. */
+@media (max-width: 700px) {
+  :root {
+    --nav-height: 96px;
+    --subnav-height: 52px;
+  }
+  nav {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    white-space: normal;
+    padding: 0.4rem 0.5rem;
+    align-content: center;
+  }
+  nav a {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.6rem;
+  }
+  .subnav {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    white-space: normal;
+    align-content: center;
+  }
+}

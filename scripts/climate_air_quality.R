@@ -79,7 +79,10 @@ ggsave(out_path, p, width = 10, height = 5.5, dpi = 150, bg = CHART_BG, create.d
 p_portrait <- p +
   labs(subtitle = sprintf("%d stations, %.1f°×%.1f° grid\nMost recent reading: %s",
                            nrow(d), GRID_DEG, GRID_DEG, format(latest_reading, "%Y-%m-%d"))) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom",
+        plot.margin = margin(t = 20, r = 2, b = 16, l = 2),
+        plot.subtitle = element_text(lineheight = 1.4),
+        plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT)) +
   guides(fill = guide_colorbar(title.position = "top", barwidth = unit(3.2, "in"), barheight = unit(0.3, "in")))
 ggsave(sub("(\\.[a-zA-Z]+)$", "-portrait\\1", out_path), p_portrait,
        width = 6, height = 7.6, dpi = 150, bg = CHART_BG, create.dir = TRUE)
