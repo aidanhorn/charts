@@ -63,6 +63,7 @@ ggsave(out_path, p, width = 10, height = 5.5, dpi = 150, bg = CHART_BG, create.d
 # - coord_fixed() otherwise vertically centres the whole block, leaving a
 # large empty gap above the title on a much taller canvas.
 p_portrait <- p +
+  labs(fill = "Renewables share (%)") +  # single line - the bottom legend has plenty of width, unlike the landscape one
   theme(legend.position = "bottom",
         plot.margin = margin(t = 20, r = 2, b = 16, l = 2),
         plot.caption = element_text(size = CHART_CAPTION_SIZE_PORTRAIT, margin = margin(t = 18))) +
