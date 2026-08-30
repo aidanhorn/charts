@@ -47,7 +47,11 @@ build_plot <- function(ncol) {
     ) +
     theme_dark_chart() +
     theme(strip.background = element_rect(fill = CHART_PANEL, colour = CHART_GRID),
-          strip.text = element_text(colour = CHART_TEXT))
+          strip.text = element_text(colour = CHART_TEXT),
+          # Extra horizontal gap between facet panels - without it, the
+          # last x-axis label of one panel (e.g. "2026") sits right next to
+          # the first label of the next panel (e.g. "2016").
+          panel.spacing.x = unit(20, "pt"))
 }
 
 # Landscape: 3 columns x 2 rows. Portrait: 2 columns x 3 rows - a straight

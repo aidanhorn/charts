@@ -83,6 +83,43 @@ build_crypto_chart <- function(coin_id, title_text, colour, price_digits = 0) {
   list(plot = plot, latest = latest)
 }
 
+# Fetches a FRED series via the official observations API (needs FRED_API_KEY
+# - a repo secret in CI, read from ~/.Renviron locally) and returns a styled
+# price chart. Requires httr2 to already be loaded by the calling script.
+build_fred_chart <- function(series_id, title_text, y_label, colour,
+                              date_format = "%Y-%m-%d", tail_n = NULL, price_digits = 0) {
+  api_key <- Sys.getenv("FRED_API_KEY")
+  if (!nzchar(api_key)) stop("FRED_API_KEY environment variable is not set")
+
+  resp <- httr2::request("https://api.stlouisfed.org/fred/series/observations") |>
+    httr2::req_url_query(series_id = series_id, api_key = api_key, file_type = "json") |>
+    httr2::req_perform()
+
+  obs <- httr2::resp_body_json(resp)$observations
+  d <- data.frame(
+    date = as.Date(sapply(obs, `[[`, "date")),
+    price = suppressWarnings(as.numeric(sapply(obs, `[[`, "value")))  # FRED marks missing periods as "."
+  )
+  d <- d[!is.na(d$price), ]
+  if (!is.null(tail_n)) d <- tail(d, tail_n)
+  latest <- d[nrow(d), ]
+
+  fmt_price <- function(v) formatC(v, format = "f", digits = price_digits, big.mark = " ")
+
+  plot <- ggplot(d, aes(x = date, y = price)) +
+    geom_line(colour = colour, linewidth = 0.7) +
+    scale_y_continuous(labels = function(v) paste0("$", fmt_price(v))) +
+    labs(
+      title = title_text,
+      subtitle = sprintf("Latest: $%s on %s", fmt_price(latest$price), format(latest$date, date_format)),
+      x = NULL, y = y_label,
+      caption = sprintf("Source: FRED (%s) | charts.aidanhorn.co.za | auto-updated", series_id)
+    ) +
+    theme_dark_chart()
+
+  list(plot = plot, latest = latest)
+}
+
 theme_dark_void <- function(base_size = 12) {
   theme_void(base_size = base_size) %+replace%
     theme(

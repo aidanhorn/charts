@@ -49,7 +49,15 @@ jobs:
 
       - name: Update commodities (oil) chart
         if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: Rscript scripts/commodities_oil.R
+
+      - name: Update commodities (natural gas) chart
+        if: github.event.schedule == '15 6 * * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: Rscript scripts/commodities_natgas.R
 
       - name: Update energy (generation mix) chart
         if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
@@ -61,7 +69,21 @@ jobs:
 
       - name: Update commodities (copper) chart
         if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: Rscript scripts/commodities_copper.R
+
+      - name: Update commodities (wheat) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: Rscript scripts/commodities_wheat.R
+
+      - name: Update commodities (corn) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: Rscript scripts/commodities_corn.R
 
       - name: Commit updated chart(s)
         run: |
