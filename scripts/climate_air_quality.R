@@ -30,9 +30,15 @@ results <- c(fetch_page(1), fetch_page(2))
 d <- data.frame(
   lon = sapply(results, function(r) r$coordinates$longitude %||% NA),
   lat = sapply(results, function(r) r$coordinates$latitude %||% NA),
-  pm25 = sapply(results, function(r) r$value %||% NA)
+  pm25 = sapply(results, function(r) r$value %||% NA),
+  datetime = sapply(results, function(r) r$datetime$utc %||% NA)
 )
 d <- d[!is.na(d$lon) & !is.na(d$lat) & !is.na(d$pm25) & d$pm25 >= 0 & d$pm25 < 500, ]
+latest_reading <- max(as.POSIXct(d$datetime, format = "%Y-%m-%dT%H:%M:%S", tz = "UTC"), na.rm = TRUE)
+# This pipeline itself only runs once a day (see update-charts.yml), which is
+# the binding constraint on displayable precision - not the underlying
+# sensors' own (hourly) reporting granularity. Floor to the day.
+latest_reading <- as.Date(latest_reading)
 
 # Bin into a coarse lat/lon grid and average PM2.5 per cell, rather than
 # plotting 1900+ individual overlapping points.
@@ -54,7 +60,8 @@ p <- ggplot() +
                         labels = function(v) paste0(v, " µg/m³")) +
   labs(
     title = "Global air quality: PM2.5, latest readings",
-    subtitle = sprintf("%d stations, averaged into a %.1f°×%.1f° grid", nrow(d), GRID_DEG, GRID_DEG),
+    subtitle = sprintf("%d stations, averaged into a %.1f°×%.1f° grid | most recent reading: %s",
+                        nrow(d), GRID_DEG, GRID_DEG, format(latest_reading, "%Y-%m-%d")),
     fill = "PM2.5",
     caption = "Source: OpenAQ | charts.aidanhorn.co.za | auto-updated"
   ) +

@@ -3,7 +3,7 @@ name: Update charts
 on:
   schedule:
     - cron: "15 6 * * *"    # daily - crypto, climate (air quality), oil
-    - cron: "20 6 1 * *"    # monthly (1st) - slower-cadence pillars (energy, real estate)
+    - cron: "20 6 1 * *"    # monthly (1st) - slower-cadence pillars (energy, real estate, copper)
   workflow_dispatch: {}
 
 permissions:
@@ -42,6 +42,10 @@ jobs:
       - name: Update real estate (house prices) chart
         if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
         run: Rscript scripts/real_estate_house_prices.R
+
+      - name: Update commodities (copper) chart
+        if: github.event.schedule == '20 6 1 * *' || github.event_name == 'workflow_dispatch'
+        run: Rscript scripts/commodities_copper.R
 
       - name: Commit updated chart(s)
         run: |

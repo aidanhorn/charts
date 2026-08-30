@@ -6,6 +6,7 @@
   --text-dim: #d5dbe2;
   --link: #58a6ff;
   --nav-height: 56px;
+  --subnav-height: 44px;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -39,6 +40,41 @@ nav a:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 nav a.active { background: var(--link); color: #0d1117; font-weight: 600; }
 nav a.home { color: var(--text); font-weight: 700; margin-right: 0.5rem; }
 
+.subnav {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0; right: 0;
+  height: var(--subnav-height);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.75rem 0 1.5rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  white-space: nowrap;
+  z-index: 9;
+}
+.subnav .subnav-label {
+  color: var(--text-dim);
+  opacity: 0.6;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+.subnav a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.88rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+}
+.subnav a:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+.subnav a.active { color: var(--text); font-weight: 600; background: rgba(88,166,255,0.15); }
+
+body.has-subnav main {
+  padding-top: calc(var(--nav-height) + var(--subnav-height));
+}
+
 main {
   padding-top: var(--nav-height);
   height: 100%;
@@ -55,6 +91,9 @@ main img {
   border-radius: 6px;
   background: var(--panel);
   margin: 1rem;
+}
+body.has-subnav main img {
+  max-height: calc(100vh - var(--nav-height) - var(--subnav-height) - 2rem);
 }
 .status {
   color: var(--text-dim);
